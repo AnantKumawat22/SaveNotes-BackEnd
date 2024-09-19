@@ -4,7 +4,7 @@ const fetchuser = require('../middleware/fetchuser');
 const Notes = require('../models/Notes');
 const { body, validationResult } = require('express-validator');
 
-// ROUTE 1: Get all the Notes using: GET "/api/auth/fetchallnotes". Login required.
+// ROUTE 1: Get all the Notes using: GET "/api/notes/fetchallnotes". Login required.
 router.get('/fetchallnotes', fetchuser, async (req, res) => {
     try {
         // Fetch and send all the notes corresponding to the user logged in.
@@ -16,7 +16,7 @@ router.get('/fetchallnotes', fetchuser, async (req, res) => {
     }
 });
 
-// ROUTE 2: Add a New Note using: POST "/api/auth/addnote". Login required.
+// ROUTE 2: Add a New Note using: POST "/api/notes/addnote". Login required.
 router.post('/addnote', fetchuser, [
     body('title', "Title Cannot be Empty.").isLength({ min: 1 }),
     body('description', "Description Cannot be Empty.").isLength({ min: 1 }),
@@ -45,7 +45,7 @@ router.post('/addnote', fetchuser, [
     }
 });
 
-// ROUTE 3: Update an existing Note using: PUT "/api/auth/updatenote". Login required.
+// ROUTE 3: Update an existing Note using: PUT "/api/notes/updatenote". Login required.
 router.put('/updatenote/:id', fetchuser, [
     body('title', "Title Cannot be Empty.").isLength({ min: 1 }),
     body('description', "Description Cannot be Empty.").isLength({ min: 1 }),
@@ -70,7 +70,7 @@ router.put('/updatenote/:id', fetchuser, [
         let note = await Notes.findById(req.params.id);
         if (!note) { return res.status(404).json({success: false, msg: "Note Not Found."}); }
 
-        // Check if the note user want to delete, is his/her note or user want to delete any other user's note.
+        // Check if the note user want to update, is his/her note or user want to update any other user's note.
         if (note.user.toString() !== req.user.id) {
             return res.status(401).json({success: false, msg: "Updation of this Note Not Allowed."});
         }
@@ -84,7 +84,7 @@ router.put('/updatenote/:id', fetchuser, [
     }
 });
 
-// ROUTE 4: Delete an existing Note using: DELETE "/api/auth/deletenote". Login required.
+// ROUTE 4: Delete an existing Note using: DELETE "/api/notes/deletenote". Login required.
 router.delete('/deletenote/:id', fetchuser, async (req, res) => {
     try {
         // Find the note to be delete.
